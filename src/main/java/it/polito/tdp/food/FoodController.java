@@ -5,8 +5,11 @@
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.food.model.Congiunti;
+import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,7 +44,7 @@ public class FoodController {
     private Button btnSimula; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxFood"
-    private ComboBox<?> boxFood; // Value injected by FXMLLoader
+    private ComboBox<Food> boxFood; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -49,19 +52,44 @@ public class FoodController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Creazione grafo...");
+    	try {
+    	int porzioni=Integer.parseInt(txtPorzioni.getText());
+    	txtResult.setText(model.creaGrafo(porzioni));
+    	boxFood.getItems().addAll(model.getVertex());
+    	}catch(NumberFormatException nbe) {
+    		txtResult.setText("Inserisci un numero valido!");
+    	}
     }
     
     @FXML
     void doCalorie(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Analisi calorie...");
+    	Food f=boxFood.getValue();
+    	if(f!=null) {
+    		List<Congiunti> result=model.getCongiunti(f,5);
+    		txtResult.appendText("LISTA CALORIE CONGIUNTE:\n");
+    		for(Congiunti c:result) {
+    			txtResult.appendText(c.getF()+" - "+c.getPeso()+"\n");
+    		}
+    	}else {
+    		txtResult.setText("Inserisci un cibo valido");
+    	}
     }
 
     @FXML
     void doSimula(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Simulazione...");
+    	try {
+        	int k=Integer.parseInt(txtK.getText());
+        	Food f=boxFood.getValue();
+        	if(f!=null) {
+        	txtResult.setText(model.simula(k, f));
+        	}else {
+        		txtResult.setText("Inserisci un cibo valido");
+        	}
+        	}catch(NumberFormatException nbe) {
+        		txtResult.setText("Inserisci un numero valido!");
+        	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
